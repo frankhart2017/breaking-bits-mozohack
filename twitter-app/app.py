@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, redirect, flash, jsonify
 import mysql.connector
 
 from tweet_fetch import get_tweets
+from inference import predict
 
 app = Flask(__name__)
 
@@ -27,18 +28,34 @@ def fetch():
         myresult = mycursor.fetchall()
 
         start = len(myresult)
-        end = len(tweets) - len(myresult)
+        end = len(tweets_mine) - len(myresult)
 
         mycursor.execute("SELECT * FROM tweet_mentions WHERE handle='" + handle + "'")
         myresult = mycursor.fetchall()
 
         start_one = len(myresult)
-        end_one = len(tweets_mine) - len(myresult)
+        end_one = len(tweets) - len(myresult)
+
+        for i in range(start_one, end_one):
+            bully = predict(tweets[i])
+            sql = "INSERT INTO tweet_mentions (screenname, handle, tweet, bully) VALUES (%s, %s, %s, %s)"
+            val = (tweets_screen_names[i], handle, tweets[i], bully)
+            mycursor.execute(sql, val)
 
         for i in range(start, end):
-            mycursor.execute("INSERT INTO twitter('handle', 'tweet') VALUES('" + handle + "', '" + tweets_mine[i] + "')")
+            bully = predict(tweets_mine[i])
+            sql = "INSERT INTO twitter (handle, tweet, bully) VALUES(%s, %s, %s)"
+            val = (handle, tweets_mine[i], bully)
+            mycursor.execute(sql, val)
 
-        return jsonify({"res": myresult})
+        conn.commit()
+
+        status = "Pushed"
+
+        if start == 0 or start_one == 0:
+            status = "No new data to push"
+
+        return jsonify({"res": status})
 
     if request.method == "GET":
         tweets = get_tweets("@sdharchou")
