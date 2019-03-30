@@ -9,6 +9,8 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = 'my-secret-key'
 app.config['SESSION_TYPE'] = 'filesystem'
 
+conn = mysql.connector.connect(host="localhost", user="root", password="root", database="breakingbits")
+
 @app.route('/fetch', methods=['GET', 'POST'])
 def fetch():
 

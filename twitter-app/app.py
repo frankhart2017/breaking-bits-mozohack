@@ -3,6 +3,7 @@ import mysql.connector
 
 from tweet_fetch import get_tweets
 from inference import predict
+from warning import warn_user
 
 app = Flask(__name__)
 
@@ -27,33 +28,55 @@ def fetch():
         mycursor.execute("SELECT * FROM twitter WHERE handle='" + handle + "'")
         myresult = mycursor.fetchall()
 
-        start = len(myresult)
-        end = len(tweets_mine) - len(myresult)
-
         mycursor.execute("SELECT * FROM tweet_mentions WHERE handle='" + handle + "'")
-        myresult = mycursor.fetchall()
+        myresult_one = mycursor.fetchall()
 
-        start_one = len(myresult)
-        end_one = len(tweets) - len(myresult)
+        print(tweets)
 
-        for i in range(start_one, end_one):
-            bully = predict(tweets[i])
-            sql = "INSERT INTO tweet_mentions (screenname, handle, tweet, bully) VALUES (%s, %s, %s, %s)"
-            val = (tweets_screen_names[i], handle, tweets[i], bully)
-            mycursor.execute(sql, val)
+        existing_tweets = [myresult_ones[3] for myresult_ones in myresult_one]
+        existing_tweets_mine = [myresults[2] for myresults in myresult]
 
-        for i in range(start, end):
-            bully = predict(tweets_mine[i])
-            sql = "INSERT INTO twitter (handle, tweet, bully) VALUES(%s, %s, %s)"
-            val = (handle, tweets_mine[i], bully)
-            mycursor.execute(sql, val)
+        print(existing_tweets)
+
+        for i in range(len(tweets)):
+            if(tweets[i] not in existing_tweets):
+                bully = predict(tweets[i])
+                sql = "INSERT INTO tweet_mentions (screenname, handle, tweet, bully, status) VALUES (%s, %s, %s, %s, %s)"
+                val = (tweets_screen_names[i], handle, tweets[i], bully, 0)
+                mycursor.execute(sql, val)
+
+            else:
+                break
 
         conn.commit()
 
-        status = "Pushed"
+        mycursor.execute("SELECT * FROM tweet_mentions WHERE handle='" + handle + "'")
+        myresult_one = mycursor.fetchall()
 
-        if start == 0 or start_one == 0:
-            status = "No new data to push"
+        users = [myresult_ones[1] for myresult_ones in myresult_one if myresult_ones[4] == 0 and myresult_ones[5] == 0]
+        users = set(users)
+
+        print(users)
+
+        for user in users:
+            sql = "UPDATE tweet_mentions SET status = 1 WHERE screenname = '" + user + "'"
+            mycursor.execute(sql)
+
+        for i in range(len(tweets_mine)):
+            if(tweets_mine[i] not in existing_tweets_mine):
+                bully = predict(tweets_mine[i])
+                sql = "INSERT INTO twitter (handle, tweet, bully) VALUES(%s, %s, %s)"
+                val = (handle, tweets_mine[i], bully)
+                mycursor.execute(sql, val)
+            else:
+                break
+
+        conn.commit()
+
+        if len(users) > 0:
+            warn_user("xxxxxx", "xxxxxxx", users)
+
+        status = "Pushed"
 
         return jsonify({"res": status})
 
