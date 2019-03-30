@@ -1,0 +1,25 @@
+.fg {
+    background: url('../img/logo.png');
+    height: auto;
+    width: 100%;
+    display: block;
+    /* Other styles here */
+}
+
+.loader{
+    position: absolute;
+    top: 40%;
+    left: 47%;
+}
+
+
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
+main {
+    flex: 1 0 auto;
+  }
+
