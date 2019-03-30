@@ -74,7 +74,7 @@ def fetch():
         conn.commit()
 
         if len(users) > 0:
-            warn_user("xxxxxx", "xxxxxxx", users)
+            warn_user("xxxxx", "xxxxx", users)
 
         status = "Pushed"
 
