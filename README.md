@@ -3,3 +3,4 @@
 <p align="center"><img src="https://travis-ci.org/dwyl/esta.svg?branch=master" width="100" /></p>
 
 <h2 align="center">Save.AI</h2>
+SAVE.AI is a platform that allows users to control cyberbullying on social platforms like Twitter, Facebook.
