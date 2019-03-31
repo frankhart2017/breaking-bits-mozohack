@@ -55,7 +55,7 @@ def fetch():
 
         conn.commit()
 
-        sql = "SELECT * FROM facebook WHERE user='Vastu Kosh'"
+        sql = "SELECT * FROM facebook WHERE user='xxxxx'"
         mycursor.execute(sql)
         myresults = mycursor.fetchall()
 
