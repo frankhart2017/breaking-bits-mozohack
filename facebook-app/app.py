@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, redirect, flash, jsonify
+from flask_cors import CORS
 import mysql.connector
 from sightengine.client import SightengineClient
 
@@ -6,6 +7,8 @@ from fetch import get_feed
 from block import block_user
 
 app = Flask(__name__)
+
+CORS(app)
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = 'my-secret-key'
@@ -20,12 +23,10 @@ def fetch():
 
     if request.method == "POST":
 
-        data = request.get_json()
+        username = request.form['username']
+        password = request.form['password']
 
-        username = data['username']
-        password = data['password']
-
-        urls = get_feed(username, password ,"xxxxxx")
+        urls = get_feed(username, password ,"Vastu Kosh")
 
         im_urls = [url for url in urls.keys()]
         profile_urls = [url for url in urls.values()]
@@ -43,7 +44,7 @@ def fetch():
         for i in range(len(im_urls)):
             if im_urls[i] not in imgs:
                 sql = "INSERT INTO facebook (img, user, url, bully, status) VALUES (%s, %s, %s, %s, %s)"
-                val = (im_urls[i], "xxxxx", profile_urls[i], predictions[i], 0)
+                val = (im_urls[i], "Vastu Kosh", profile_urls[i], predictions[i], 0)
                 print(val)
                 mycursor.execute(sql, val)
 
@@ -55,7 +56,7 @@ def fetch():
 
         conn.commit()
 
-        sql = "SELECT * FROM facebook WHERE user='xxxxx'"
+        sql = "SELECT * FROM facebook WHERE user='Vastu Kosh'"
         mycursor.execute(sql)
         myresults = mycursor.fetchall()
 
@@ -72,3 +73,30 @@ def fetch():
 def index():
 
     return jsonify({"hello": "world"})
+
+@app.route('/info', methods=['GET', 'POST'])
+def info():
+
+    if request.method == "POST":
+
+        username = request.form['username']
+        password = request.form['password']
+
+        mycursor = conn.cursor()
+
+        sql = "SELECT * FROM facebook WHERE user = '" + "Vastu Kosh" + "'"
+
+        mycursor.execute(sql)
+        myresults = mycursor.fetchall()
+
+        user = "Vastu Kosh"
+
+        num = len(myresults)
+
+        nus = len([myresult[4] for myresult in myresults if myresult[4] == 0])
+        nub = len([myresult[4] for myresult in myresults if myresult[4] == 1])
+
+        sip = [myresult[3] for myresult in myresults if myresult[4] == 0]
+        bip = [myresult[3] for myresult in myresults if myresult[4] == 1]
+
+        return jsonify({"user": user, "num": num, "nub": nub, "nus": nus, "bip": bip, "sip": sip})

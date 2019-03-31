@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, redirect, flash, jsonify
+from flask_cors import CORS
 import mysql.connector
 
 from tweet_fetch import get_tweets
@@ -6,6 +7,8 @@ from inference import predict
 from warning import warn_user
 
 app = Flask(__name__)
+
+CORS(app)
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = 'my-secret-key'
@@ -18,8 +21,7 @@ def fetch():
 
     if request.method == "POST":
 
-        data = request.get_json()
-        handle = data['handle']
+        handle = request.form['handle']
 
         tweets, tweets_screen_names, tweets_mine = get_tweets(handle)
 
@@ -74,13 +76,40 @@ def fetch():
         conn.commit()
 
         if len(users) > 0:
-            warn_user("xxxxx", "xxxxx", users)
+            warn_user("sdharchou@gmail.com", "#include<sid.h>", users)
 
         status = "Pushed"
 
         return jsonify({"res": status})
 
     if request.method == "GET":
-        tweets = get_tweets("xxxxxx")
+        tweets = get_tweets("@sdharchou")
 
         return jsonify({"tweets": tweets})
+
+@app.route('/info', methods=['GET', 'POST'])
+def info():
+
+    if request.method == "POST":
+
+        handle = request.form['handle']
+
+        mycursor = conn.cursor()
+
+        sql = "SELECT * FROM tweet_mentions WHERE handle = '" + handle + "'"
+
+        mycursor.execute(sql)
+        myresults = mycursor.fetchall()
+
+        nut = len(myresults)
+
+        nub = len([myresult[4] for myresult in myresults if myresult[4] == 0])
+        nus = len([myresult[4] for myresult in myresults if myresult[4] == 1])
+
+        bad_users = []
+
+        for myresult in myresults:
+            if myresult[4] == 0 and myresult[1] not in bad_users:
+                bad_users.append(myresult[1])
+
+        return jsonify({"handle": handle, "nut": nut, "nub": nub, "nus": nus, "bad": bad_users})
