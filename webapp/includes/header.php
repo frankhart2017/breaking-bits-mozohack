@@ -25,9 +25,7 @@
           Save.AI
         </a>
 
-        <a href="" data-activates="side-nav" class="button-collapse show-on-large right">
-          <i class="material-icons">menu</i>
-        </a>
+        
         <ul class="right hide-on-med-and-down">
 
 
@@ -42,28 +40,11 @@
             <a href="pawn.php">Facebook</a>
           </li>
           <li>
-            <a href="repay.php">Reddit</a>
+            <a href="repay.php">Eva</a>
           </li>
           
         </ul>
-        <ul id="side-nav" class="side-nav">
-          
-          
-          <li >
-            <a href="index.php">Dashboard</a>
-          </li>
-
-          <li>
-            <a href="collateral.php">Twitter</a>
-          </li>
-          <li>
-            <a href="pawn.php">Facebook</a>
-          </li>
-          <li>
-            <a href="repay.php">Reddit</a>
-          </li>
-
-        </ul>
+      
       </div>
     </div>
   </nav>

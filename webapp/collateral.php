@@ -157,7 +157,7 @@ $('.section').hide();
     // Fire off the request to /form.php
     request = $.ajax({
         async: true,
-        url: "http://admoveo.serveo.net/info",
+        url: "http://twrest.serveo.net/info",
         type: "post",
         data: serializedData
      
