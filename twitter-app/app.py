@@ -81,6 +81,6 @@ def fetch():
         return jsonify({"res": status})
 
     if request.method == "GET":
-        tweets = get_tweets("@sdharchou")
+        tweets = get_tweets("xxxxxx")
 
         return jsonify({"tweets": tweets})
